@@ -85,10 +85,6 @@ export default function ExplorePage() {
   const [sortBy, setSortBy] = useState<"severity" | "name">("severity");
 
   useEffect(() => {
-    if (!zip) return;
-  }, [zip]);
-
-  useEffect(() => {
     let on = true;
     setErr(null);
     setData(null);

@@ -1,5 +1,9 @@
-import { NextResponse } from "next/server";
+// app/api/[zip]/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+
+// (Optional but safe on Netlify) ensure Node runtime
+export const runtime = "nodejs";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,12 +28,14 @@ function ratioOrNull(a: number | null, b: number | null) {
   return a / b;
 }
 
+// ✅ Next 15 / Netlify expects `context.params` to be a Promise
 export async function GET(
-  _req: Request,
-  { params }: { params: { zip: string } }
+  _req: NextRequest,
+  context: { params: Promise<{ zip: string }> }
 ) {
   try {
-    const zip = (params.zip || "").padStart(5, "0");
+    const { zip: rawZip } = await context.params;
+    const zip = (rawZip || "").padStart(5, "0");
 
     // 1) Distinct PWS for the ZIP
     const { data: zips, error: zErr } = await supabase
@@ -117,8 +123,7 @@ export async function GET(
           ),
       });
 
-      // We don’t have an explicit list_type column in details,
-      // so use a heuristic: if guideline exists and SystemAverage > HG → exceeds.
+      // Heuristic: exceeds if guideline exists and SystemAverage > HG (or times_above_ewg > 1)
       const exceedsList: Contam[] = [];
       const othersList: Contam[] = [];
 
@@ -133,7 +138,7 @@ export async function GET(
         (exceeds ? exceedsList : othersList).push(item);
       }
 
-      // Pull one row for utility metadata if available
+      // Utility metadata
       const metaRow = list[0] ?? {};
       const Systemname = metaRow.utility_name ?? null;
       const Population = metaRow.serves_population ?? null;
