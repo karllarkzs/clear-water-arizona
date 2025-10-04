@@ -1,103 +1,134 @@
+"use client";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [zip, setZip] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const cleaned = zip.replace(/\D/g, "").slice(0, 5);
+    if (!/^\d{5}$/.test(cleaned)) {
+      setError("Please enter a valid 5-digit ZIP code.");
+      return;
+    }
+    setError(null);
+    router.push(`/explore/${cleaned}`);
+  }
+
+  return (
+    <main className="min-h-screen bg-white flex items-center">
+      <section className="mx-auto w-full max-w-6xl px-4 py-8">
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          {/* Left image */}
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-sm">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="https://plus.unsplash.com/premium_photo-1729537378649-066872523a70?q=80&w=1600&auto=format&fit=crop"
+              alt="Pouring a glass of water"
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+
+          {/* Right card */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-8 shadow-sm">
+            <div className="mx-auto max-w-md text-center">
+              <h2 className="font-semibold text-sky-600">
+                Clear Water Arizona
+              </h2>
+              <p className="mt-2 text-xl font-semibold text-slate-900 md:text-2xl">
+                Is Your Tap Water Safe for Drinking?
+              </p>
+              <h3 className="mt-1 text-3xl font-extrabold tracking-tight text-sky-700 md:text-4xl">
+                ENTER YOUR ZIP CODE
+              </h3>
+
+              <form onSubmit={onSubmit} className="mt-6">
+                <div className="flex items-stretch gap-2">
+                  <input
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    placeholder="Zip Code"
+                    value={zip}
+                    onChange={(e) => setZip(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-lg outline-none transition focus:border-sky-500
+             text-black placeholder:text-slate-400"
+                    aria-label="ZIP code"
+                  />
+
+                  <button
+                    type="submit"
+                    className="inline-flex items-center justify-center rounded-xl bg-sky-600 px-4 text-lg font-semibold text-white transition hover:bg-sky-700 active:bg-sky-800 md:px-5"
+                    aria-label="Search"
+                    title="Search"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="-mr-0.5"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </button>
+                </div>
+                {error && (
+                  <p className="mt-2 text-sm text-rose-600" role="alert">
+                    {error}
+                  </p>
+                )}
+              </form>
+
+              <ul className="mt-6 space-y-2 text-left text-slate-700">
+                <li className="flex gap-2">
+                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-sky-500" />
+                  <span>Explore the hidden impurities in your tap water</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-sky-500" />
+                  <span>Uncover potential health hazards of contaminants</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-sky-500" />
+                  <span>Get effective home filtration solutions</span>
+                </li>
+              </ul>
+
+              <p className="mt-6 text-sm leading-6 text-slate-600">
+                Waterdrop works with the Environmental Working Group (EWG) to
+                unveil the truth about your tap water. Enter your ZIP code to
+                uncover specific contaminants and how to safeguard yourself and
+                your loved ones.
+              </p>
+
+              <p className="mt-4 text-xs text-slate-500">
+                * Data Source: licensed from Environmental Working Group,{" "}
+                <a
+                  href="https://www.ewg.org"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline decoration-sky-400 underline-offset-2 hover:text-sky-700"
+                >
+                  www.ewg.org
+                </a>
+                .
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }

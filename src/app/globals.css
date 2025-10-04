@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Make form controls readable by default */
+input[type="text"],
+input[type="search"],
+textarea {
+  color: var(--foreground);  /* or #0f172a for slate-900 */
+}
+@media (prefers-color-scheme: dark) {
+  input[type="text"],
+  input[type="search"],
+  textarea {
+    color: #171717; /* slate-50 */
+  }
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
